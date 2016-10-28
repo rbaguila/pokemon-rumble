@@ -1,18 +1,15 @@
-Example Program for CMSC 137 Project
-
+Pokemon Rumble
 A. Run the Server
  	
- 		>java -jar circlewars-server.jar 2
+ 		>java -jar GameServer.jar 2(number of players)
  		
 
 B. Run the Clients (Number of clients is based on the parameter passed in server)
 		
-		>java -jar circlewars-client.jar localhost jach
-
-C. Enjoy coding.
+		>java -jar PokemonRumble.jar localhost roi
 
 
-jachermocilla@gmail.com
+rbaguila1@up.edu.ph
 
 
 
