@@ -6,7 +6,7 @@ package ph.edu.uplb.ics.it238;
  *
  */
 public interface Constants {
-	public static final String APP_NAME="Circle Wars 0.01";
+	public static final String APP_NAME="Pokemon Rumble 0.01";
 	
 	/**
 	 * Game states.
