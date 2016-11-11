@@ -3,9 +3,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
@@ -13,9 +10,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -31,15 +29,20 @@ import javax.swing.JPanel;
 
 public class PokemonRumble extends JPanel implements Runnable, Constants{
 	
-	ImageIcon[] pIcons = new ImageIcon[4];
-	ImageIcon bg = new ImageIcon("images/FIELD.jpg");
-	ImageIcon poke = new ImageIcon("images/pokeball.png");
-	ImageIcon title = new ImageIcon("images/TITLE.jpg");
-	ImageIcon [] eIcons = new ImageIcon[4];
-	ImageIcon gameOver = new ImageIcon("images/GAMEOVER.png");
+//	ImageIcon[] pIcons = new ImageIcon[4];
+//	ImageIcon bg = new ImageIcon("images/FIELD.jpg");
+//	ImageIcon poke = new ImageIcon("images/pokeball.png");
+//	ImageIcon title = new ImageIcon("images/TITLE.jpg");
+//	ImageIcon [] eIcons = new ImageIcon[4];
+//	ImageIcon gameOver = new ImageIcon("images/GAMEOVER.png");
 	
-	
-
+	BufferedImage gameOver;
+	BufferedImage title;
+	BufferedImage bg;
+    BufferedImage poke;
+    BufferedImage[] pIcons;
+    BufferedImage[] eIcons;
+    
 	
 	Point[] players;
 	int playerRadius = 20;
@@ -68,7 +71,7 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * Game timer, handler receives data from server to update game state
 	 */
 	Thread t=new Thread(this);
-
+	NetPlayer nplayer;
 	
 	/**
 	 * Nice name!
@@ -90,7 +93,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * Flag to indicate whether this player has connected or not
 	 */
 	boolean connected=false;
-	
 	/**
 	 * get a datagram socket
 	 */
@@ -103,7 +105,27 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	String serverData;
 	private boolean serverConnected = false;
 	
-	
+	public void initImages() {
+		try {
+			bg = ImageIO.read(this.getClass().getResource("images/FIELD.jpg"));
+			poke = ImageIO.read(this.getClass().getResource("images/pokeball.png"));
+			gameOver = ImageIO.read(this.getClass().getResource("images/GAMEOVER.png"));
+			title = ImageIO.read(this.getClass().getResource("images/TITLE.jpg"));
+	        pIcons = new BufferedImage[4];
+	        pIcons[0] = ImageIO.read(this.getClass().getResource("images/player1.png"));
+	        pIcons[1] = ImageIO.read(this.getClass().getResource("images/player2.png"));
+	        pIcons[2] = ImageIO.read(this.getClass().getResource("images/player3.png"));
+	        pIcons[3] = ImageIO.read(this.getClass().getResource("images/player4.png"));
+	        
+	        eIcons = new BufferedImage[4];
+	        eIcons[RED] = ImageIO.read(this.getClass().getResource("images/enemy1_40x40.png"));
+	        eIcons[BLUE] = ImageIO.read(this.getClass().getResource("images/enemy2_40x40.png"));
+	        eIcons[BLACK] = ImageIO.read(this.getClass().getResource("images/enemy3_40x40.png"));
+	        eIcons[WHITE] = ImageIO.read(this.getClass().getResource("images/enemy4_40x40.png"));
+		} catch (IOException ex) {
+            Logger.getLogger(PokemonRumble.class.getName()).log(Level.SEVERE, null, ex);
+        }
+	}
 	/**
 	 * Basic constructor
 	 * @param server
@@ -111,24 +133,22 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * @throws Exception
 	 */
 	
-	public void initImages() {
-		pIcons[0] = new ImageIcon("images/player1.png");
-		pIcons[1] = new ImageIcon("images/player2.png");
-		pIcons[2] = new ImageIcon("images/player3.png");
-		pIcons[3] = new ImageIcon("images/player4.png");
-	
-		eIcons[RED] = new ImageIcon("images/enemy1_40x40.png");
-		eIcons[BLUE] = new ImageIcon("images/enemy2_40x40.png");
-		eIcons[BLACK] = new ImageIcon("images/enemy3_40x40.png");
-		eIcons[WHITE] = new ImageIcon("images/enemy4_40x40.png");
-	}
+//	public void initImages() {
+//		pIcons[0] = new ImageIcon("images/player1.png");
+//		pIcons[1] = new ImageIcon("images/player2.png");
+//		pIcons[2] = new ImageIcon("images/player3.png");
+//		pIcons[3] = new ImageIcon("images/player4.png");
+//	
+//		eIcons[RED] = new ImageIcon("images/enemy1_40x40.png");
+//		eIcons[BLUE] = new ImageIcon("images/enemy2_40x40.png");
+//		eIcons[BLACK] = new ImageIcon("images/enemy3_40x40.png");
+//		eIcons[WHITE] = new ImageIcon("images/enemy4_40x40.png");
+//	}
 	
 	public PokemonRumble(String server,String name) throws Exception{
 		this.server=server;
 		this.name=name;
-		
 		initImages();
-		
 		frame.setTitle(APP_NAME+":"+name);
 		//set some timeout for the socket
 		socket.setSoTimeout(100);
@@ -246,37 +266,70 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * Repainting method
 	 */
 	
-	public void paintComponent(Graphics g){
-		
-		if (!connected){
-			title.paintIcon(this, g, 0, 0);
-		}
-		else
-		{
-			bg.paintIcon(this, g, 0, 0);
-		}
-		
-		if (connected)
-			poke.paintIcon(this, g, pokeballCoords.x - pokeballRadius, pokeballCoords.y - pokeballRadius);	
+//	public void paintComponent(Graphics g){
+//		
+//		if (!connected){
+//			title.paintIcon(this, g, 0, 0);
+//		}
+//		else
+//		{
+//			bg.paintIcon(this, g, 0, 0);
+//		}
+//		
+//		if (connected)
+//			poke.paintIcon(this, g, pokeballCoords.x - pokeballRadius, pokeballCoords.y - pokeballRadius);	
+//	
+//		if (enemy != null) {
+//			for (int i = 0; i < enemy.length; i++) {
+//				eIcons[e_type[i]].paintIcon(this, g, enemy[i].x - enemyRadius, enemy[i].y - enemyRadius);
+//			}
+//		}
+//		
+//		if (players != null){
+//		for (int i = 0; i < players.length; i++) {
+//			pIcons[i].paintIcon(this, g, players[i].x - playerRadius, players[i].y - playerRadius);
+//			if (pStats[i] == 1 && playerNames[i].equals(name)){
+//				gameOver.paintIcon(this, g, 100, 40);
+//			}
+//		}
+//		}
+//		
+//		if (connected)
+//			paintScore(g);
+//	}
 	
-		if (enemy != null) {
-			for (int i = 0; i < enemy.length; i++) {
-				eIcons[e_type[i]].paintIcon(this, g, enemy[i].x - enemyRadius, enemy[i].y - enemyRadius);
-			}
+	public void paintComponent(Graphics g){
+		   g.drawImage(bg, 0, 0, this.getWidth(), this.getHeight(), this);
+	       g.drawImage(poke, pokeballCoords.x, pokeballCoords.y, this);
+//	       for(String playerDta: playerData.keySet()){
+//	           NetPlayer netPlayer = playerData.get(playerDta);
+//	           g.drawImage(pIcons[netPlayer.getPicNumber()], netPlayer.getX()-20, netPlayer.getY()-20, this);
+//	           if (netPlayer.getStatus()  == 1 && netPlayer.getName().equals(name)){
+//	        	   g.drawImage(gameOver, 100, 40, this);
+//	           }
+////	           if (netPlayer.getStatus()  == 2 && netPlayer.getName().equals(name)){
+////	        	   g.drawImage(youWon, 100, 40, this);
+////	          }
+//	           
+//	       }
+	       if (players != null){
+	   		for (int i = 0; i < players.length; i++) {
+	   			g.drawImage(pIcons[i], players[i].x - playerRadius, players[i].y - playerRadius, this);
+//	   			pIcons[i].paintIcon(this, g, players[i].x - playerRadius, players[i].y - playerRadius);
+	   			if (pStats[i] == 1 && playerNames[i].equals(name)){
+	   				g.drawImage(gameOver, 100, 40, this);
+	   			}
+	   		}
+	       }
+	       
+	       if (enemy != null) {
+				for (int i = 0; i < enemy.length; i++) {
+					g.drawImage(eIcons[e_type[i]], enemy[i].x - enemyRadius, enemy[i].y - enemyRadius, this);
+	           }
+	       }
+	       paintScore(g);
 		}
-		
-		if (players != null){
-		for (int i = 0; i < players.length; i++) {
-			pIcons[i].paintIcon(this, g, players[i].x - playerRadius, players[i].y - playerRadius);
-			if (pStats[i] == 1 && playerNames[i].equals(name)){
-				gameOver.paintIcon(this, g, 100, 40);
-			}
-		}
-		}
-		
-		if (connected)
-			paintScore(g);
-	}
+	
 	
 	private void paintScore(Graphics g) {
 		
