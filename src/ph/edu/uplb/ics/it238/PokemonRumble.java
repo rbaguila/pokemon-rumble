@@ -19,14 +19,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-//import org.cmsc137.project.dynoman2.engine.Configuration;
 /**
- * The game client itself!
+ * 
  * @author Roinand B. Aguila
  *
  */
  
- //point coordinated for mushroom
+ //point coordinated for pokeball
  //enemy
  
 
@@ -34,7 +33,7 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	
 	ImageIcon[] pIcons = new ImageIcon[4];
 	ImageIcon bg = new ImageIcon("images/FIELD.jpg");
-	ImageIcon mush = new ImageIcon("images/mushroom.png");
+	ImageIcon poke = new ImageIcon("images/pokeball.png");
 	ImageIcon title = new ImageIcon("images/TITLE.jpg");
 	ImageIcon [] eIcons = new ImageIcon[4];
 	ImageIcon gameOver = new ImageIcon("images/GAMEOVER.png");
@@ -52,8 +51,8 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	int enemyRadius = 20;
 	int[] e_type;
 
-	Point mushroomCoords = new Point();
-	int mushroomRadius = 20;
+	Point pokeballCoords = new Point();
+	int pokeballRadius = 20;
 	
 	/**
 	 * Main window
@@ -113,10 +112,10 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 */
 	
 	public void initImages() {
-		pIcons[0] = new ImageIcon("images/mario40x40.png");
-		pIcons[1] = new ImageIcon("images/luigi40x40.png");
-		pIcons[2] = new ImageIcon("images/yoshi40x40.png");
-		pIcons[3] = new ImageIcon("images/birdo40x40.png");
+		pIcons[0] = new ImageIcon("images/player1.png");
+		pIcons[1] = new ImageIcon("images/player2.png");
+		pIcons[2] = new ImageIcon("images/player3.png");
+		pIcons[3] = new ImageIcon("images/player4.png");
 	
 		eIcons[RED] = new ImageIcon("images/enemy1_40x40.png");
 		eIcons[BLUE] = new ImageIcon("images/enemy2_40x40.png");
@@ -134,7 +133,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 		//set some timeout for the socket
 		socket.setSoTimeout(100);
 		
-		//Some gui stuff i hate.
 		frame.getContentPane().add(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(815, 635);
@@ -161,9 +159,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 		
 	}
 	
-	/**
-	 * The juicy part!
-	 */
 	public void run(){
 		while(true){
 			try{
@@ -173,9 +168,7 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 			// send data
 			if (prevX != x || prevY != y){
 				send("PLAYER "+name+" "+x+" "+y);
-			}				
-			
-			
+			}		
 			//Get the data from players
 			byte[] buf = new byte[1024];
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -186,14 +179,8 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 			serverData=new String(buf);
 			serverData=serverData.trim();
 			
-
 			System.out.println(serverData);
 			
-			//if (!serverData.equals("")){
-			//	System.out.println("Server Data:" +serverData);
-			//}
-
-			//Study the following kids. 
 			if (!connected && serverData.startsWith("CONNECTED")){
 				connected=true;
 				System.out.println("Connected.");
@@ -240,16 +227,14 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 						}
 					}
 					
-					//mushroom
-					else if (s_object.startsWith("MUSHROOM")){
-							String[] mushroomInfo = s_object.split(" ");
-							mushroomCoords.x = Integer.parseInt(mushroomInfo[1]);
-							mushroomCoords.y = Integer.parseInt(mushroomInfo[2]);
+					//pokeball
+					else if (s_object.startsWith("POKEBALL")){
+							String[] pokeballInfo = s_object.split(" ");
+							pokeballCoords.x = Integer.parseInt(pokeballInfo[1]);
+							pokeballCoords.y = Integer.parseInt(pokeballInfo[2]);
 					}
 			
 				}
-				
-						
 					//show the changes		
 					frame.repaint();
 				
@@ -262,15 +247,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 */
 	
 	public void paintComponent(Graphics g){
-		//TODO: task 4..
-		//bgk
-		//if (enemy != null)
-		//{paint all enemies}
-		//f (playerCoords ! 
-		
-		//check if alive{paint}
-		//if (players[i].p_stat)
-		//check if dead{show score}
 		
 		if (!connected){
 			title.paintIcon(this, g, 0, 0);
@@ -281,7 +257,7 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 		}
 		
 		if (connected)
-			mush.paintIcon(this, g, mushroomCoords.x - mushroomRadius, mushroomCoords.y - mushroomRadius);	
+			poke.paintIcon(this, g, pokeballCoords.x - pokeballRadius, pokeballCoords.y - pokeballRadius);	
 	
 		if (enemy != null) {
 			for (int i = 0; i < enemy.length; i++) {
@@ -300,7 +276,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 		
 		if (connected)
 			paintScore(g);
-		
 	}
 	
 	private void paintScore(Graphics g) {
@@ -318,9 +293,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 			g.drawString(playerNames[i] + " : " + pScore[i], -135 + size, 570);
 			size=size + 200;
 		}
-		
-		
-		
 	}
 	
 	

@@ -63,38 +63,14 @@ public class GameServer implements Runnable, Constants{
 	List<Enemy> enemies = new ArrayList<Enemy>();
 	
 	
-	// Mushroom Information
-	Point mushroomCoords = new Point(400,300);
-	final int mushroomRadius = 20;
-	final int mushroomDiameter = mushroomRadius * 2;
+	// Pokeball Information
+	Point pokeballCoords = new Point(400,300);
+	final int pokeballRadius = 20;
+	final int pokeballDiameter = pokeballRadius * 2;
 	
 	// Player info
 	final int playerRadius = 20;
-	final int playerDiameter = mushroomRadius * 2;
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	////////////////////////////////////////////////////
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	final int playerDiameter = pokeballRadius * 2;
 	
 	
 	/**
@@ -239,14 +215,14 @@ public class GameServer implements Runnable, Constants{
 							String name=(String)ite.next();
 							NetPlayer netPlayer=(NetPlayer)playerMap.get(name);
 							Point p = new Point(netPlayer.getX(),netPlayer.getY());
-							if (intersectsMushroom(p)) {
+							if (intersectsPokeball(p)) {
 								netPlayer.addScore();	//TODO: 1 is gameOver
 								enemies.add(new Enemy());
 
 								 //Update the game state
-								// randomize mushroom
-									mushroomCoords.x = (new Random()).nextInt(800 - mushroomRadius);
-									mushroomCoords.y = (new Random()).nextInt(600 - mushroomRadius);
+								// randomize pokeball
+									pokeballCoords.x = (new Random()).nextInt(800 - pokeballRadius);
+									pokeballCoords.y = (new Random()).nextInt(600 - pokeballRadius);
 
 								
 							}
@@ -264,8 +240,8 @@ public class GameServer implements Runnable, Constants{
 						  }
 						msg += "-" + enemyData;
 					}
-					  // send mushroom
-					  msg += ("-MUSHROOM "  + mushroomCoords.x + " " + mushroomCoords.y);
+					  // send pokeball
+					  msg += ("-POKEBALL "  + pokeballCoords.x + " " + pokeballCoords.y);
 					     
 					  //Send to all the updated game state
 					  broadcast(msg);
@@ -288,10 +264,10 @@ public class GameServer implements Runnable, Constants{
 		return ellipseArea.intersects(p.getX(),p.getY(),playerDiameter,playerDiameter);
 	}
 	
-	private boolean intersectsMushroom(Point object1) {
+	private boolean intersectsPokeball(Point object1) {
 		java.awt.geom.Ellipse2D ellipseArea = new java.awt.geom.Ellipse2D.Float((float)object1.getX(),(float)object1.getY(),(float)playerRadius,(float)playerRadius);
 		
-		return ellipseArea.intersects(mushroomCoords.getX(),mushroomCoords.getY(),mushroomDiameter,mushroomDiameter);
+		return ellipseArea.intersects(pokeballCoords.getX(),pokeballCoords.getY(),pokeballDiameter,pokeballDiameter);
 	}
 	
 	public static void main(String args[]){
