@@ -29,13 +29,6 @@ import javax.swing.JPanel;
 
 public class PokemonRumble extends JPanel implements Runnable, Constants{
 	
-//	ImageIcon[] pIcons = new ImageIcon[4];
-//	ImageIcon bg = new ImageIcon("images/FIELD.jpg");
-//	ImageIcon poke = new ImageIcon("images/pokeball.png");
-//	ImageIcon title = new ImageIcon("images/TITLE.jpg");
-//	ImageIcon [] eIcons = new ImageIcon[4];
-//	ImageIcon gameOver = new ImageIcon("images/GAMEOVER.png");
-	
 	BufferedImage gameOver;
 	BufferedImage title;
 	BufferedImage bg;
@@ -133,18 +126,6 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * @throws Exception
 	 */
 	
-//	public void initImages() {
-//		pIcons[0] = new ImageIcon("images/player1.png");
-//		pIcons[1] = new ImageIcon("images/player2.png");
-//		pIcons[2] = new ImageIcon("images/player3.png");
-//		pIcons[3] = new ImageIcon("images/player4.png");
-//	
-//		eIcons[RED] = new ImageIcon("images/enemy1_40x40.png");
-//		eIcons[BLUE] = new ImageIcon("images/enemy2_40x40.png");
-//		eIcons[BLACK] = new ImageIcon("images/enemy3_40x40.png");
-//		eIcons[WHITE] = new ImageIcon("images/enemy4_40x40.png");
-//	}
-	
 	public PokemonRumble(String server,String name) throws Exception{
 		this.server=server;
 		this.name=name;
@@ -199,7 +180,7 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 			serverData=new String(buf);
 			serverData=serverData.trim();
 			
-			System.out.println(serverData);
+//			System.out.println(serverData);
 			
 			if (!connected && serverData.startsWith("CONNECTED")){
 				connected=true;
@@ -266,56 +247,12 @@ public class PokemonRumble extends JPanel implements Runnable, Constants{
 	 * Repainting method
 	 */
 	
-//	public void paintComponent(Graphics g){
-//		
-//		if (!connected){
-//			title.paintIcon(this, g, 0, 0);
-//		}
-//		else
-//		{
-//			bg.paintIcon(this, g, 0, 0);
-//		}
-//		
-//		if (connected)
-//			poke.paintIcon(this, g, pokeballCoords.x - pokeballRadius, pokeballCoords.y - pokeballRadius);	
-//	
-//		if (enemy != null) {
-//			for (int i = 0; i < enemy.length; i++) {
-//				eIcons[e_type[i]].paintIcon(this, g, enemy[i].x - enemyRadius, enemy[i].y - enemyRadius);
-//			}
-//		}
-//		
-//		if (players != null){
-//		for (int i = 0; i < players.length; i++) {
-//			pIcons[i].paintIcon(this, g, players[i].x - playerRadius, players[i].y - playerRadius);
-//			if (pStats[i] == 1 && playerNames[i].equals(name)){
-//				gameOver.paintIcon(this, g, 100, 40);
-//			}
-//		}
-//		}
-//		
-//		if (connected)
-//			paintScore(g);
-//	}
-	
 	public void paintComponent(Graphics g){
 		   g.drawImage(bg, 0, 0, this.getWidth(), this.getHeight(), this);
 	       g.drawImage(poke, pokeballCoords.x, pokeballCoords.y, this);
-//	       for(String playerDta: playerData.keySet()){
-//	           NetPlayer netPlayer = playerData.get(playerDta);
-//	           g.drawImage(pIcons[netPlayer.getPicNumber()], netPlayer.getX()-20, netPlayer.getY()-20, this);
-//	           if (netPlayer.getStatus()  == 1 && netPlayer.getName().equals(name)){
-//	        	   g.drawImage(gameOver, 100, 40, this);
-//	           }
-////	           if (netPlayer.getStatus()  == 2 && netPlayer.getName().equals(name)){
-////	        	   g.drawImage(youWon, 100, 40, this);
-////	          }
-//	           
-//	       }
 	       if (players != null){
 	   		for (int i = 0; i < players.length; i++) {
 	   			g.drawImage(pIcons[i], players[i].x - playerRadius, players[i].y - playerRadius, this);
-//	   			pIcons[i].paintIcon(this, g, players[i].x - playerRadius, players[i].y - playerRadius);
 	   			if (pStats[i] == 1 && playerNames[i].equals(name)){
 	   				g.drawImage(gameOver, 100, 40, this);
 	   			}

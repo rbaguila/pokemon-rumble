@@ -143,9 +143,6 @@ public class GameServer implements Runnable, Constants{
 			
 			//remove excess bytes
 			playerData = playerData.trim();
-			//if (!playerData.equals("")){
-			//	System.out.println("Player Data:"+playerData);
-			//}
 		
 			// process
 			switch(gameStage){
